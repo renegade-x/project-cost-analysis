@@ -3,6 +3,15 @@ name: Linux verification
 on:
   push:
     branches: [master]
+    paths:
+      - app/**
+      - tests/**
+      - scripts/**
+      - deployment/**
+      - wsgi.py
+      - requirements.txt
+      - .python-version
+      - .github/workflows/linux-verification.yml
   workflow_dispatch:
 
 permissions:

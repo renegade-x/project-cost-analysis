@@ -54,7 +54,7 @@ Code review found no string-built SQL, `|safe` on user data, `innerHTML`, `eval`
 - The application removes a `Server` header when present in the Flask response, but the WSGI server or hosting proxy may add its own header after Flask; stripping that requires server/proxy configuration.
 - Statistical anomalies are review signals, not proof of error or fraud. Large uniform overruns use the fallback threshold when there is no statistical spread.
 - Gemini output can be inaccurate even with aggregate inputs. Review summaries against the actual data. The configured model and free-tier availability depend on Google and the account.
-- Live Gemini verification, Linux Gunicorn startup, Render hosting, and HTTPS smoke checks remain deployment-time checks; see `docs/verification.md` for the local evidence and limits.
+- Linux Gunicorn startup has passed on GitHub Actions. Live Gemini and hosted HTTPS checks remain pending; the user chose PythonAnywhere after Render required payment information. See `docs/verification.md` for evidence and limits.
 
 ## Data sent to third parties
 

@@ -107,6 +107,8 @@ The three required security demonstrations print clear PASS lines for invalid up
 
 ## Render deployment preparation
 
+**Current no-card hosting choice:** see [the PythonAnywhere setup guide](docs/pythonanywhere_setup.md). Render's account-level payment requirement blocked its free-service creation for this account; no Render service was created. Linux/Gunicorn verification has already passed on [GitHub Actions](https://github.com/renegade-x/project-cost-analysis/actions/runs/42854607377).
+
 ### Verify a real Gemini response locally
 
 Save your key privately as `GEMINI_API_KEY` in the ignored `.env` file. From the repository directory run:

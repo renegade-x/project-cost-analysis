@@ -6,6 +6,7 @@ Local verification date: **10 November 2026**. Host: Windows, Python 3.14.5.
 
 - Application factory and `/healthz` startup.
 - Production WSGI factory with an isolated test secret and in-memory database: healthy, production settings active, secure cookies required, debug disabled.
+- **Linux/Gunicorn verified on GitHub Actions:** [run 42854607377](https://github.com/renegade-x/project-cost-analysis/actions/runs/42854607377), source commit `5ecabb7902fdd252c98db493e2e5867dbc0d8725`. Ubuntu installed the pinned requirements, passed the offline test suite and dependency check, then started one Gunicorn worker with production configuration and received `{"status":"ok"}` from `/healthz`. No real credentials or uploaded data were used.
 - Fresh virtual environment: installed every pinned requirement successfully, then ran the tests using only those dependencies.
 - Full unit/integration suite in that fresh environment: **146 passed**. Tests isolate the developer's environment and `.env`, block external network connections, and mock all Gemini responses. Output is retained in `test-results.txt`.
 - Security demonstrations: **19 passed**, including invalid uploads, four cross-user project operations blocked with 403, and 20 failed login attempts with the first 5 normal failures followed by 15 HTTP 429 responses. Output is retained in `security-test-results.txt`.
@@ -26,6 +27,7 @@ Browser verification used a synthetic local account and a 13-item project (one m
 ## Checks requiring another environment or credentials
 
 - **Real Gemini call:** no API key was supplied. Success, exceptions, empty output, oversized output, timeouts/options, privacy bounds, and fallback behavior are covered by mocks; the offline path was verified in the browser. Provide a key and check an available `GEMINI_MODEL` to verify Google end to end.
-- **Gunicorn startup:** this native Windows host has no `fcntl`, and WSL is not installed. Gunicorn's Linux startup command and the production factory are prepared; run the README's Gunicorn smoke test on Linux/Render. No operating-system changes were made to enable WSL.
-- **Live deployment and HTTPS:** no Render service was created. `render.yaml`, the Python version file, environment instructions, and post-deployment smoke checklist are ready. Confirm HTTPS, HSTS, cookies, persistence expectations, and the full journey after deploying.
+- **Live deployment and HTTPS:** Render rejected both Blueprint planning and standard free-service creation with a requirement for payment information. No Render service was created, and no payment method was added. The user chose the no-card PythonAnywhere fallback. Deployment is awaiting the free account; confirm HTTPS, HSTS, cookies, and the full journey after hosting is configured.
 - **Course screenshot evidence:** a checklist is included. Local QA screenshots and a PDF were generated in ignored `artifacts/`; deployed/Gemini-key screenshots must be captured when those services are available.
+
+The local Windows host still has no WSL; it was not necessary to install it because the Linux check ran on GitHub's standard public-repository runner. An unapplied Render Blueprint draft remains in the confirmed workspace. Its planning failed and no resource sync was approved.
