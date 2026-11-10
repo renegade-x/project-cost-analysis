@@ -28,6 +28,7 @@ def test_prompt_allowlist_and_limits():
     assert all(len(row["category"]) == 50 for row in payload["categories"])
     assert "PRIVATE_PROJECT" not in prompt and "PRIVATE_USER" not in prompt
     assert "untrusted data" in prompt
+    assert "Variance = actual - estimated" in prompt
 
 
 def test_anomaly_payload_uses_full_category_aggregate():
