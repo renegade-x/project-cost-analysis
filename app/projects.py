@@ -5,7 +5,7 @@ from flask_wtf.file import FileField
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
-from .analysis import aggregate_by_category, compute_rows, compute_totals
+from .analysis import aggregate_by_category, compute_rows, compute_totals, detect_anomalies
 from .extensions import db, limiter
 from .models import CostItem, Project
 from .security import get_owned_project_or_403, validate_amount, validate_category
@@ -50,6 +50,7 @@ def _dashboard(project, item_form=None):
     return render_template(
         "projects/detail.html", project=project, item_form=item_form or ItemForm(),
         item_rows=list(zip(project.items, rows)), totals=compute_totals(rows), upload_form=UploadForm(),
+        anomalies=detect_anomalies(rows),
     )
 
 
