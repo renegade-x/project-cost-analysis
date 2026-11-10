@@ -8,7 +8,7 @@ Open <https://www.pythonanywhere.com/pricing/>, choose **Create a Beginner accou
 
 ## Install the app in a Bash console
 
-The console and Web app must use the same supported Python version. The official Flask instructions currently demonstrate Python 3.13; select a version available in both places, at least Python 3.11. The exact sequence below uses 3.13.
+The console and Web app must use the same supported Python version. The official Flask instructions currently demonstrate Python 3.13; the exact sequence below uses 3.13. The pinned requirements, test suite, and production Gunicorn startup have passed on Python 3.13 in [Linux CI](https://github.com/renegade-x/project-cost-analysis/actions/runs/42855824036).
 
 ```bash
 git clone https://github.com/renegade-x/project-cost-analysis.git
@@ -37,6 +37,8 @@ PythonAnywhere supplies the production WSGI hosting; do not start Flask's develo
 ## Add Gemini privately
 
 In **Files**, open `/home/YOUR_USERNAME/project-cost-analysis/.env`. Paste the key after `GEMINI_API_KEY=` and save. Keep `APP_ENV=production`. Choose a `GEMINI_MODEL` available to your key and free-tier project. Never place the key in a tracked source file or WSGI template.
+
+For a new Google API account, use `GEMINI_MODEL=gemini-3.5-flash-lite` for the initial live check. Google's current documentation limits the original `gemini-2.5-flash` model to prior users and recommends 3.5 Flash-Lite as its replacement. The replacement has a standard free tier; eligibility and quota still depend on the project. The application's default from the original development plan remains overridable through this environment variable. See [Google's deprecation notice](https://ai.google.dev/gemini-api/docs/deprecations) and [pricing](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.5-flash-lite).
 
 In the existing activated Bash console:
 
