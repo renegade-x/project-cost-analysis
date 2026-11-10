@@ -1,12 +1,13 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, ValidationError
 
+from .analysis import compute_rows, compute_totals
 from .extensions import db
-from .models import Project
-from .security import get_owned_project_or_403
+from .models import CostItem, Project
+from .security import get_owned_project_or_403, validate_amount, validate_category
 
 bp = Blueprint("projects", __name__)
 
@@ -14,6 +15,35 @@ bp = Blueprint("projects", __name__)
 class ProjectForm(FlaskForm):
     name = StringField("Project name", filters=[lambda s: s.strip() if s else s], validators=[InputRequired(), Length(min=1, max=100)])
     submit = SubmitField("Create project")
+
+
+def _category(form, field):
+    try:
+        field.data = validate_category(field.data or "")
+    except ValueError as error:
+        raise ValidationError(str(error)) from error
+
+
+def _amount(form, field):
+    try:
+        validate_amount(field.data)
+    except ValueError as error:
+        raise ValidationError(str(error)) from error
+
+
+class ItemForm(FlaskForm):
+    category = StringField("Category", validators=[InputRequired(), _category])
+    estimated = StringField("Estimated", validators=[InputRequired(), _amount])
+    actual = StringField("Actual", validators=[InputRequired(), _amount])
+    submit = SubmitField("Add cost item")
+
+
+def _dashboard(project, item_form=None):
+    rows = compute_rows(project.items)
+    return render_template(
+        "projects/detail.html", project=project, item_form=item_form or ItemForm(),
+        item_rows=list(zip(project.items, rows)), totals=compute_totals(rows),
+    )
 
 
 @bp.route("/projects", methods=["GET", "POST"])
@@ -36,7 +66,7 @@ def index():
 @login_required
 def detail(project_id):
     project = get_owned_project_or_403(project_id)
-    return render_template("projects/detail.html", project=project)
+    return _dashboard(project)
 
 
 @bp.post("/projects/<int:project_id>/delete")
@@ -47,3 +77,36 @@ def delete(project_id):
     db.session.commit()
     flash("Project deleted.", "success")
     return redirect(url_for("projects.index"))
+
+
+@bp.post("/projects/<int:project_id>/items")
+@login_required
+def add_item(project_id):
+    project = get_owned_project_or_403(project_id)
+    form = ItemForm()
+    if not form.validate_on_submit():
+        return _dashboard(project, item_form=form)
+    project.items.append(CostItem(
+        category=form.category.data, estimated=validate_amount(form.estimated.data),
+        actual=validate_amount(form.actual.data),
+    ))
+    project.clear_summary()
+    db.session.commit()
+    flash("Cost item added.", "success")
+    return redirect(url_for("projects.detail", project_id=project.id))
+
+
+@bp.post("/projects/<int:project_id>/items/<int:item_id>/delete")
+@login_required
+def delete_item(project_id, item_id):
+    project = get_owned_project_or_403(project_id)
+    item = db.session.scalar(db.select(CostItem).where(
+        CostItem.project_id == project.id, CostItem.id == item_id,
+    ))
+    if item is None:
+        abort(404)
+    db.session.delete(item)
+    project.clear_summary()
+    db.session.commit()
+    flash("Cost item deleted.", "success")
+    return redirect(url_for("projects.detail", project_id=project.id))
