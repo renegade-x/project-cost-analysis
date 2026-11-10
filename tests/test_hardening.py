@@ -35,3 +35,6 @@ def test_production_headers_and_cookies(monkeypatch):
     assert application.config["PERMANENT_SESSION_LIFETIME"].total_seconds() == 7200
     assert application.debug is False
     assert "max-age=31536000" in application.test_client().get("/healthz").headers["Strict-Transport-Security"]
+    response = application.test_client().get("/auth/login", base_url="https://localhost")
+    cookie = response.headers["Set-Cookie"]
+    assert "Secure" in cookie and "HttpOnly" in cookie and "SameSite=Lax" in cookie

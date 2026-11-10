@@ -77,6 +77,8 @@ Labour,200,180
 
 Extra columns are ignored. Imports append items to the project; they do not replace existing items. Categories must be nonempty and at most 100 characters after sanitizing. Numbers must be finite, nonnegative, and at most 1,000,000,000. Amounts are rounded to two decimal places using decimal half-up rounding.
 
+The custom request class also keeps multipart upload streams in memory; larger files do not spill to a temporary disk file. The 2 MB request limit bounds memory use for each upload.
+
 `Variance = Actual - Estimated`. `% Variance = Variance / Estimated × 100`; zero estimates show `N/A`. Repeated category names are combined in charts and AI requests. Anomalies use a population z-score with an absolute threshold of 2 when at least five percentage values have nonzero spread; otherwise they use a 25% absolute variance threshold. Positive spending without an estimate is always flagged.
 
 XLSX formulas are never evaluated. The reader uses cached values; a formula with no cached value in a required cell is rejected. Formula-shaped text categories are prefixed with an apostrophe. This protective quote can be visible in the UI and exports.

@@ -29,14 +29,15 @@ def sanitize_cell(value: str) -> str:
 
 def validate_category(value: str) -> str:
     clean = sanitize_cell(value)
-    if not clean or not clean.lstrip("'").strip():
+    visible = "".join(c for c in value if unicodedata.category(c) not in {"Cc", "Cf", "Cs"}).strip()
+    if not visible:
         raise ValueError("Category is required.")
     if len(clean) > 100:
         raise ValueError("Category must be at most 100 characters after sanitizing.")
     return clean
 
 
-def validate_amount(value) -> float:
+def validate_amount(value: object) -> float:
     try:
         amount = Decimal(str(value).strip())
     except (InvalidOperation, ValueError, TypeError):

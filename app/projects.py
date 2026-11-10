@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_file, url_for
 from pathlib import Path
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
@@ -59,7 +60,7 @@ def _dashboard(project, item_form=None):
 
 @bp.route("/projects", methods=["GET", "POST"])
 @login_required
-def index():
+def index() -> ResponseReturnValue:
     form = ProjectForm()
     if form.validate_on_submit():
         project = Project(name=form.name.data, user_id=current_user.id)
@@ -75,14 +76,14 @@ def index():
 
 @bp.get("/projects/<int:project_id>")
 @login_required
-def detail(project_id):
+def detail(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     return _dashboard(project)
 
 
 @bp.post("/projects/<int:project_id>/delete")
 @login_required
-def delete(project_id):
+def delete(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     db.session.delete(project)
     db.session.commit()
@@ -92,7 +93,7 @@ def delete(project_id):
 
 @bp.post("/projects/<int:project_id>/items")
 @login_required
-def add_item(project_id):
+def add_item(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     form = ItemForm()
     if not form.validate_on_submit():
@@ -109,7 +110,7 @@ def add_item(project_id):
 
 @bp.post("/projects/<int:project_id>/items/<int:item_id>/delete")
 @login_required
-def delete_item(project_id, item_id):
+def delete_item(project_id: int, item_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     item = db.session.scalar(db.select(CostItem).where(
         CostItem.project_id == project.id, CostItem.id == item_id,
@@ -126,7 +127,7 @@ def delete_item(project_id, item_id):
 @bp.post("/projects/<int:project_id>/upload")
 @login_required
 @limiter.limit("10 per minute", override_defaults=False)
-def upload(project_id):
+def upload(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     try:
         rows = parse_upload(
@@ -145,7 +146,7 @@ def upload(project_id):
 
 @bp.get("/projects/<int:project_id>/chart-data")
 @login_required
-def chart_data(project_id):
+def chart_data(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     categories = aggregate_by_category(compute_rows(project.items))
     return {
@@ -159,7 +160,7 @@ def chart_data(project_id):
 @bp.post("/projects/<int:project_id>/analysis")
 @login_required
 @limiter.limit("5 per minute", override_defaults=False)
-def analysis(project_id):
+def analysis(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     if not project.items:
         flash("Add at least one cost item before generating a summary.", "error")
@@ -173,7 +174,7 @@ def analysis(project_id):
 
 @bp.get("/projects/<int:project_id>/report.pdf")
 @login_required
-def report_pdf(project_id):
+def report_pdf(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     return send_file(build_report(project), mimetype="application/pdf", as_attachment=True,
                      download_name=f"cost-report-{project.id}.pdf")
@@ -181,13 +182,13 @@ def report_pdf(project_id):
 
 @bp.get("/projects/<int:project_id>/export.csv")
 @login_required
-def export_csv(project_id):
+def export_csv(project_id: int) -> ResponseReturnValue:
     project = get_owned_project_or_403(project_id)
     return send_file(build_csv(project), mimetype="text/csv", as_attachment=True,
                      download_name=f"cost-report-{project.id}.csv")
 
 
 @bp.get("/sample.csv")
-def sample_csv():
+def sample_csv() -> ResponseReturnValue:
     return send_file(Path(current_app.root_path).parent / "sample_data" / "valid_costs.csv",
                      mimetype="text/csv", as_attachment=True, download_name="sample-costs.csv")

@@ -55,6 +55,14 @@ def owned_project(app, client, make_user, login):
 
 
 @pytest.fixture(autouse=True)
+def isolated_environment(monkeypatch):
+    """The developer's .env and credentials must never influence isolated tests."""
+    monkeypatch.setattr("app.load_dotenv", lambda: None)
+    for name in ("SECRET_KEY", "DATABASE_URL", "GEMINI_API_KEY", "GEMINI_MODEL", "APP_ENV"):
+        monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture(autouse=True)
 def no_external_network(monkeypatch):
     """A missing mock must fail immediately, never call Gemini or any other service."""
     import socket

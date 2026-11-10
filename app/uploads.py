@@ -4,6 +4,7 @@ from io import BytesIO, StringIO
 from pathlib import PurePosixPath
 import zipfile
 
+from flask import Request
 from openpyxl import load_workbook
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -13,6 +14,16 @@ from .security import validate_amount, validate_category
 
 REQUIRED = ("category", "estimated", "actual")
 MAX_UNCOMPRESSED = 20 * 1024 * 1024
+
+
+class InMemoryUploadRequest(Request):
+    def _get_file_stream(
+        self, total_content_length: int | None, content_type: str | None,
+        filename: str | None = None, content_length: int | None = None,
+    ) -> BytesIO:
+        # Werkzeug otherwise spools larger uploads to disk before our parser runs.
+        # Flask's 2 MB request limit bounds these in-memory file streams.
+        return BytesIO()
 
 
 class UploadError(ValueError):
@@ -44,7 +55,7 @@ def _validated_rows(records, max_rows: int) -> list[dict]:
         result = {}
         for name in REQUIRED:
             try:
-                result[name] = (validate_category(str(values[name] or "")) if name == "category"
+                result[name] = (validate_category("" if values[name] is None else str(values[name])) if name == "category"
                                 else validate_amount(values[name]))
             except ValueError as error:
                 row_errors.append(f"{name.title()}: {error}")

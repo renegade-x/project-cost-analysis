@@ -5,6 +5,7 @@ from urllib.parse import unquote, urlsplit
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf import FlaskForm
+from flask.typing import ResponseReturnValue
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import PasswordField, StringField, SubmitField
@@ -53,7 +54,7 @@ def safe_next(value: str | None) -> str | None:
 
 @bp.route("/register", methods=["GET", "POST"])
 @limiter.limit("10 per hour", methods=["POST"], override_defaults=False)
-def register():
+def register() -> ResponseReturnValue:
     if current_user.is_authenticated:
         return redirect(url_for("projects.index"))
     form = RegisterForm()
@@ -74,7 +75,7 @@ def register():
 
 @bp.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute", methods=["POST"], override_defaults=False)
-def login():
+def login() -> ResponseReturnValue:
     if current_user.is_authenticated:
         return redirect(url_for("projects.index"))
     form = LoginForm()
@@ -94,7 +95,7 @@ def login():
 
 @bp.post("/logout")
 @login_required
-def logout():
+def logout() -> ResponseReturnValue:
     logout_user()
     session.clear()
     return redirect(url_for("auth.login"))

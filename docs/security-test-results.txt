@@ -1,0 +1,48 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.2.0, pluggy-1.7.0 -- D:\cost-analysis\.venv-verify\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\cost-analysis
+configfile: pytest.ini
+plugins: anyio-4.16.0
+collecting ... collected 19 items
+
+tests/test_security.py::test_invalid_file_upload_demonstration PASS: binary CSV, executable extension, fake XLSX, and oversized uploads rejected; no rows saved.
+PASSED
+tests/test_security.py::test_unauthorized_project_access_idor_demonstration PASS: user B cannot open, upload to, download a report for, or delete user A's project (403).
+PASSED
+tests/test_security.py::test_excessive_login_requests_demonstration PASS: 20 rapid login attempts: first 5 normal failures, remaining 15 blocked with 429.
+PASSED
+tests/test_security.py::test_csrf_missing_token_rejected_and_valid_token_accepted PASS: missing CSRF token rejected (400); valid token accepted.
+PASSED
+tests/test_security.py::test_xss_category_is_escaped PASS: script-shaped category rendered as escaped text.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[=] PASS: formula prefix '=' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[+] PASS: formula prefix '+' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[-] PASS: formula prefix '-' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[@] PASS: formula prefix '@' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[\t] PASS: formula prefix '\t' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_formula_injection_neutralized_in_database_html_csv_and_pdf[\r] PASS: formula prefix '\r' neutralized in storage, HTML, CSV, and PDF source.
+PASSED
+tests/test_security.py::test_sql_injection_strings_cannot_bypass_login_or_break_entry PASS: SQL-shaped input stays data and cannot bypass authentication.
+PASSED
+tests/test_security.py::test_password_hash_and_generic_login_errors PASS: passwords hashed; unknown-user and wrong-password errors identical.
+PASSED
+tests/test_security.py::test_security_headers_on_normal_response PASS: CSP, nosniff, frame denial, referrer and permissions policies present.
+PASSED
+tests/test_security.py::test_internal_error_does_not_leak_stack_trace PASS: forced internal error returns a generic 500 without internal paths or stack traces.
+PASSED
+tests/test_security.py::test_other_sensitive_route_rate_limits[/auth/register-10] PASS: /auth/register enforced its 10-request limit.
+PASSED
+tests/test_security.py::test_other_sensitive_route_rate_limits[/projects/1/upload-10] PASS: /projects/1/upload enforced its 10-request limit.
+PASSED
+tests/test_security.py::test_other_sensitive_route_rate_limits[/projects/1/analysis-5] PASS: /projects/1/analysis enforced its 5-request limit.
+PASSED
+tests/test_security.py::test_global_limit_and_health_exemption PASS: global 200/hour limit enforced; health checks remain exempt.
+PASSED
+
+============================= 19 passed in 10.08s =============================

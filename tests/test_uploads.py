@@ -1,6 +1,7 @@
 from io import BytesIO
 import zipfile
 import pytest
+from flask import request
 from openpyxl import Workbook
 from werkzeug.datastructures import FileStorage
 
@@ -97,3 +98,28 @@ def test_upload_clears_summary(app, client, owned_project):
     upload(client, owned_project.id, HEADER + b"A,1,2")
     with app.app_context():
         assert db.session.get(Project, owned_project.id).ai_summary is None
+
+
+def test_xlsx_zero_category_is_preserved(app, client, owned_project):
+    data = workbook_bytes([["Category", "Estimated", "Actual"], [0, 1, 2]])
+    response = upload(client, owned_project.id, data, "zero.xlsx")
+    assert b"Imported 1 cost rows" in response.data
+    with app.app_context():
+        assert db.session.scalar(db.select(CostItem)).category == "0"
+
+
+def test_control_only_category_is_rejected_but_literal_quote_is_valid():
+    file = FileStorage(stream=BytesIO(HEADER + b"\t,1,2"), filename="control.csv")
+    with pytest.raises(UploadError, match="Category is required"):
+        parse_upload(file)
+    quote = FileStorage(stream=BytesIO(HEADER + b"',1,2"), filename="quote.csv")
+    assert parse_upload(quote)[0]["category"] == "'"
+
+
+def test_multipart_uploads_remain_in_memory_above_spooling_threshold(app):
+    payload = b"Category,Estimated,Actual,Ignored\n" + (b"A,1,2," + b"x" * 10000 + b"\n") * 60
+    assert len(payload) > 500 * 1024
+    with app.test_request_context("/projects/1/upload", method="POST", data={"file": (BytesIO(payload), "large-valid.csv")}):
+        uploaded = request.files["file"]
+        assert isinstance(uploaded.stream, BytesIO)
+        assert len(parse_upload(uploaded)) == 60

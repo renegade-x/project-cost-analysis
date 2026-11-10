@@ -17,17 +17,18 @@ from reportlab.platypus import (
 from .ai_summary import build_template_summary
 from .analysis import aggregate_by_category, compute_rows, compute_totals, detect_anomalies
 from .security import sanitize_cell
+from .models import Project
 
 GREEN = colors.HexColor("#245b47")
 MUTED = colors.HexColor("#5c6b65")
 LIGHT = colors.HexColor("#eef3e9")
 
 
-def safe_text(value) -> str:
+def safe_text(value: object) -> str:
     return escape(sanitize_cell(str(value)))
 
 
-def build_report(project) -> BytesIO:
+def build_report(project: Project) -> BytesIO:
     rows = compute_rows(project.items)
     totals = compute_totals(rows)
     categories = aggregate_by_category(rows)
@@ -130,7 +131,7 @@ def build_report(project) -> BytesIO:
     return output
 
 
-def build_csv(project) -> BytesIO:
+def build_csv(project: Project) -> BytesIO:
     output = StringIO(newline="")
     writer = csv.writer(output)
     writer.writerow(["Category", "Estimated", "Actual", "Variance", "% Variance", "Status"])

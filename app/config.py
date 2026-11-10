@@ -2,6 +2,7 @@
 import os
 import secrets
 from datetime import timedelta
+from flask import Flask
 
 
 class Config:
@@ -38,7 +39,7 @@ class TestConfig(Config):
     RATELIMIT_ENABLED = False
 
 
-def configure_environment(app) -> None:
+def configure_environment(app: Flask) -> None:
     """Resolve fresh values, so factories and tests never reuse stale environment."""
     if not app.testing:
         app.config.update(

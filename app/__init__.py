@@ -1,15 +1,18 @@
 """Flask application factory."""
 from flask import Flask, redirect, render_template, request, url_for
 from flask_login import current_user
+from flask.typing import ResponseReturnValue
 from dotenv import load_dotenv
 
 from .config import Config, configure_environment
 from .extensions import csrf, db, limiter, login_manager
 
 
-def create_app(config_object=None) -> Flask:
+def create_app(config_object: str | type | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
+    from .uploads import InMemoryUploadRequest
+    app.request_class = InMemoryUploadRequest
     app.config.from_object(config_object or Config)
     configure_environment(app)
     db.init_app(app)
@@ -25,12 +28,12 @@ def create_app(config_object=None) -> Flask:
     app.register_blueprint(projects_bp)
 
     @app.get("/")
-    def index():
+    def index() -> ResponseReturnValue:
         return redirect(url_for("projects.index" if current_user.is_authenticated else "auth.login"))
 
     @app.get("/healthz")
     @limiter.exempt
-    def healthz():
+    def healthz() -> ResponseReturnValue:
         return {"status": "ok"}
 
     messages = {
@@ -42,7 +45,7 @@ def create_app(config_object=None) -> Flask:
         500: "Something went wrong. Please try again later.",
     }
 
-    def error_page(error):
+    def error_page(error) -> ResponseReturnValue:
         code = error.code
         if code == 500:
             db.session.rollback()
