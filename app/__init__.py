@@ -1,5 +1,6 @@
 """Flask application factory."""
-from flask import Flask
+from flask import Flask, redirect, url_for
+from flask_login import current_user
 from dotenv import load_dotenv
 
 from .config import Config, configure_environment
@@ -18,6 +19,14 @@ def create_app(config_object=None) -> Flask:
     login_manager.login_view = "auth.login"
 
     from . import models  # Register tables before create_all.
+    from .auth import bp as auth_bp
+    from .projects import bp as projects_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(projects_bp)
+
+    @app.get("/")
+    def index():
+        return redirect(url_for("projects.index" if current_user.is_authenticated else "auth.login"))
 
     @app.get("/healthz")
     @limiter.exempt

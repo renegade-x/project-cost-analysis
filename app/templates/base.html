@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Understand your project costs, compare budgets, and spot unusual expenses.">
+  <title>{% block title %}Cost Analyzer{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <nav class="container nav" aria-label="Main navigation">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark" aria-hidden="true">c.</span>Cost Analyzer</a>
+    <div class="nav-links">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('projects.index') }}">Projects</a>
+      <span class="muted user-name">{{ current_user.username }}</span>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button secondary small" type="submit">Sign out</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}">Sign in</a>
+      <a class="button small" href="{{ url_for('auth.register') }}">Create account</a>
+    {% endif %}
+    </div>
+  </nav>
+</header>
+<main id="main" class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}" role="status">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="container site-footer">Cost Analyzer <span>Software Quality Engineering · Prototype</span></footer>
+</body>
+</html>

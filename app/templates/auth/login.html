@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% from '_forms.html' import field %}
+{% block title %}Sign in · Cost Analyzer{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-intro"><p class="eyebrow">A clearer view of your costs</p><h1>Every budget<br>tells a story.</h1><p>See where your money goes. Compare your estimates, spot the exceptions, and make sense of the numbers.</p><div class="intro-rule"></div><p class="muted">Simple calculations. Useful insights.</p></div>
+  <div class="card auth-card"><p class="eyebrow">Welcome back</p><h2>Sign in</h2><p class="muted">Your projects, all in one place.</p>
+  <form method="post">{{ form.hidden_tag() }}{{ field(form.username, 'username') }}{{ field(form.password, 'current-password') }}{{ form.submit(class_='button full') }}</form>
+  <p class="auth-switch">New here? <a href="{{ url_for('auth.register') }}">Create an account</a></p></div>
+</section>
+{% endblock %}
