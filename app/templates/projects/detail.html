@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% from '_forms.html' import field %}
 {% block title %}{{ project.name }} · Cost Analyzer{% endblock %}
+{% block scripts %}<script defer src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script><script defer src="{{ url_for('static', filename='js/charts.js') }}"></script>{% endblock %}
 {% block content %}
 <div class="page-heading"><div><a class="back-link" href="{{ url_for('projects.index') }}">← All projects</a><p class="eyebrow">Project overview</p><h1>{{ project.name }}</h1><p class="muted">Your estimates and actual costs, side by side.</p></div></div>
 <section class="metrics" aria-label="Project totals">
@@ -19,5 +20,11 @@
 {% for item, row in item_rows %}<tr><th scope="row" class="category">{{ row.category }}</th><td class="number">{{ '{:,.2f}'.format(row.estimated) }}</td><td class="number">{{ '{:,.2f}'.format(row.actual) }}</td><td class="number">{{ '{:+,.2f}'.format(row.variance) }}</td><td class="number">{{ '{:+.2f}%'.format(row.pct_variance) if row.pct_variance is not none else 'N/A' }}</td><td><span class="status">{{ row.status|capitalize }}</span></td><td><form method="post" action="{{ url_for('projects.delete_item', project_id=project.id, item_id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-button" type="submit" aria-label="Delete {{ row.category }}">Delete</button></form></td></tr>
 {% else %}<tr><td colspan="7" class="empty-table">No cost items yet. Add an item above or upload a spreadsheet.</td></tr>{% endfor %}
 </tbody><tfoot><tr><th scope="row">Total</th><td class="number">{{ '{:,.2f}'.format(totals.estimated) }}</td><td class="number">{{ '{:,.2f}'.format(totals.actual) }}</td><td class="number">{{ '{:+,.2f}'.format(totals.variance) }}</td><td class="number">{{ '{:+.2f}%'.format(totals.pct_variance) if totals.pct_variance is not none else 'N/A' }}</td><td colspan="2">{{ totals.status|capitalize }}</td></tr></tfoot></table></div></section>
+<section class="chart-section" data-chart-url="{{ url_for('projects.chart_data', project_id=project.id) }}" aria-label="Cost charts">
+<div class="section-heading"><div><p class="eyebrow">See the difference</p><h2>Costs at a glance</h2></div><span class="muted chart-note">Grouped by category</span></div>
+<p id="chart-message" class="muted" role="status">Loading charts…</p>
+<div class="charts-grid" id="charts-grid" hidden><article class="card"><h3>Estimated vs actual</h3><p class="chart-description">Compare the planned and recorded cost for each category.</p><div class="chart-frame"><canvas id="comparison-chart" role="img" aria-label="Grouped bar chart comparing estimated and actual costs by category">The cost breakdown table above contains these values.</canvas></div></article><article class="card"><h3>Variance by category</h3><p class="chart-description">Positive values show overspending; negative values show savings.</p><div class="chart-frame"><canvas id="variance-chart" role="img" aria-label="Bar chart of cost variance by category">The cost breakdown table above contains these values.</canvas></div></article></div>
+<noscript><p class="muted">Enable JavaScript to view charts. All values are available in the table above.</p></noscript>
+</section>
 <details class="delete-project"><summary>Delete this project</summary><p>This permanently removes the project and all its cost items.</p><form method="post" action="{{ url_for('projects.delete', project_id=project.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger" type="submit">Delete project and all items</button></form></details>
 {% endblock %}

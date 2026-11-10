@@ -5,7 +5,7 @@ from flask_wtf.file import FileField
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
-from .analysis import compute_rows, compute_totals
+from .analysis import aggregate_by_category, compute_rows, compute_totals
 from .extensions import db, limiter
 from .models import CostItem, Project
 from .security import get_owned_project_or_403, validate_amount, validate_category
@@ -137,3 +137,16 @@ def upload(project_id):
         db.session.commit()
         flash(f"Imported {len(rows)} cost rows successfully.", "success")
     return redirect(url_for("projects.detail", project_id=project.id))
+
+
+@bp.get("/projects/<int:project_id>/chart-data")
+@login_required
+def chart_data(project_id):
+    project = get_owned_project_or_403(project_id)
+    categories = aggregate_by_category(compute_rows(project.items))
+    return {
+        "labels": [row["category"] for row in categories],
+        "estimated": [row["estimated"] for row in categories],
+        "actual": [row["actual"] for row in categories],
+        "variance": [row["variance"] for row in categories],
+    }
