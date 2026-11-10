@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}{{ code }} · Cost Analyzer{% endblock %}
+{% block content %}<section class="empty-state card error-card"><p class="eyebrow">Error {{ code }}</p><h1>Let’s get you back on track.</h1><p class="muted">{{ message }}</p><a class="button" href="{{ url_for('index') }}">Back to workspace</a></section>{% endblock %}

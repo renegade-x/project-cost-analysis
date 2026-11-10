@@ -1,5 +1,5 @@
 """Flask application factory."""
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, render_template, url_for
 from flask_login import current_user
 from dotenv import load_dotenv
 
@@ -32,6 +32,10 @@ def create_app(config_object=None) -> Flask:
     @limiter.exempt
     def healthz():
         return {"status": "ok"}
+
+    @app.errorhandler(413)
+    def too_large(error):
+        return render_template("errors/error.html", code=413, message="The upload is too large. Use a file smaller than 2 MB."), 413
 
     with app.app_context():
         db.create_all()

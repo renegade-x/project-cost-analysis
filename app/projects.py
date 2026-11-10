@@ -1,13 +1,15 @@
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
 from .analysis import compute_rows, compute_totals
-from .extensions import db
+from .extensions import db, limiter
 from .models import CostItem, Project
 from .security import get_owned_project_or_403, validate_amount, validate_category
+from .uploads import UploadError, parse_upload
 
 bp = Blueprint("projects", __name__)
 
@@ -38,11 +40,16 @@ class ItemForm(FlaskForm):
     submit = SubmitField("Add cost item")
 
 
+class UploadForm(FlaskForm):
+    file = FileField("CSV or Excel file")
+    submit = SubmitField("Import spreadsheet")
+
+
 def _dashboard(project, item_form=None):
     rows = compute_rows(project.items)
     return render_template(
         "projects/detail.html", project=project, item_form=item_form or ItemForm(),
-        item_rows=list(zip(project.items, rows)), totals=compute_totals(rows),
+        item_rows=list(zip(project.items, rows)), totals=compute_totals(rows), upload_form=UploadForm(),
     )
 
 
@@ -109,4 +116,24 @@ def delete_item(project_id, item_id):
     project.clear_summary()
     db.session.commit()
     flash("Cost item deleted.", "success")
+    return redirect(url_for("projects.detail", project_id=project.id))
+
+
+@bp.post("/projects/<int:project_id>/upload")
+@login_required
+@limiter.limit("10 per minute")
+def upload(project_id):
+    project = get_owned_project_or_403(project_id)
+    try:
+        rows = parse_upload(
+            request.files.get("file"), max_rows=current_app.config["MAX_UPLOAD_ROWS"],
+            max_bytes=current_app.config["MAX_CONTENT_LENGTH"],
+        )
+    except UploadError as error:
+        flash(str(error), "error")
+    else:
+        project.items.extend(CostItem(**row) for row in rows)
+        project.clear_summary()
+        db.session.commit()
+        flash(f"Imported {len(rows)} cost rows successfully.", "success")
     return redirect(url_for("projects.detail", project_id=project.id))

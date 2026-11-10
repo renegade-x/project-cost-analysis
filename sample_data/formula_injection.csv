@@ -1,0 +1,5 @@
+Category,Estimated,Actual
+=1+1,100,120
++SUM(A1:A2),200,180
+@example,50,50
+-unsafe,50,50

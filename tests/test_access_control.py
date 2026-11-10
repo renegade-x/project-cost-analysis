@@ -2,7 +2,7 @@ import pytest
 from app.extensions import db
 from app.models import Project
 
-PROJECT_ROUTES = [("get", ""), ("post", "/delete"), ("post", "/items"), ("post", "/items/1/delete")]
+PROJECT_ROUTES = [("get", ""), ("post", "/delete"), ("post", "/items"), ("post", "/items/1/delete"), ("post", "/upload")]
 
 
 @pytest.mark.parametrize("method,suffix", PROJECT_ROUTES)
