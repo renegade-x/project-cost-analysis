@@ -3,7 +3,7 @@
 {% block title %}{{ project.name }} · Cost Analyzer{% endblock %}
 {% block scripts %}<script defer src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script><script defer src="{{ url_for('static', filename='js/charts.js') }}"></script>{% endblock %}
 {% block content %}
-<div class="page-heading"><div><a class="back-link" href="{{ url_for('projects.index') }}">← All projects</a><p class="eyebrow">Project overview</p><h1>{{ project.name }}</h1><p class="muted">Your estimates and actual costs, side by side.</p></div></div>
+<div class="page-heading"><div><a class="back-link" href="{{ url_for('projects.index') }}">← All projects</a><p class="eyebrow">Project overview</p><h1>{{ project.name }}</h1><p class="muted">Your estimates and actual costs, side by side.</p></div><div class="download-actions"><a class="button secondary small" href="{{ url_for('projects.export_csv', project_id=project.id) }}">Download CSV</a><a class="button small" href="{{ url_for('projects.report_pdf', project_id=project.id) }}">Download PDF <span aria-hidden="true">↓</span></a></div></div>
 <section class="metrics" aria-label="Project totals">
   <div class="metric"><p>Total estimated</p><strong>{{ '{:,.2f}'.format(totals.estimated) }}</strong><span>The planned budget</span></div>
   <div class="metric"><p>Total actual</p><strong>{{ '{:,.2f}'.format(totals.actual) }}</strong><span>Recorded spending</span></div>

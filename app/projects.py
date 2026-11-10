@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
@@ -11,6 +11,7 @@ from .extensions import db, limiter
 from .models import CostItem, Project, utcnow
 from .security import get_owned_project_or_403, validate_amount, validate_category
 from .uploads import UploadError, parse_upload
+from .report import build_csv, build_report
 
 bp = Blueprint("projects", __name__)
 
@@ -167,3 +168,19 @@ def analysis(project_id):
         db.session.commit()
         flash("Cost analysis summary generated.", "success")
     return redirect(url_for("projects.detail", project_id=project.id))
+
+
+@bp.get("/projects/<int:project_id>/report.pdf")
+@login_required
+def report_pdf(project_id):
+    project = get_owned_project_or_403(project_id)
+    return send_file(build_report(project), mimetype="application/pdf", as_attachment=True,
+                     download_name=f"cost-report-{project.id}.pdf")
+
+
+@bp.get("/projects/<int:project_id>/export.csv")
+@login_required
+def export_csv(project_id):
+    project = get_owned_project_or_403(project_id)
+    return send_file(build_csv(project), mimetype="text/csv", as_attachment=True,
+                     download_name=f"cost-report-{project.id}.csv")
