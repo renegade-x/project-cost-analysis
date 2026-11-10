@@ -52,7 +52,7 @@ def safe_next(value: str | None) -> str | None:
 
 
 @bp.route("/register", methods=["GET", "POST"])
-@limiter.limit("10 per hour")
+@limiter.limit("10 per hour", methods=["POST"], override_defaults=False)
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("projects.index"))
@@ -73,7 +73,7 @@ def register():
 
 
 @bp.route("/login", methods=["GET", "POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("5 per minute", methods=["POST"], override_defaults=False)
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("projects.index"))

@@ -1,5 +1,5 @@
 """Flask application factory."""
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, redirect, render_template, request, url_for
 from flask_login import current_user
 from dotenv import load_dotenv
 
@@ -33,9 +33,41 @@ def create_app(config_object=None) -> Flask:
     def healthz():
         return {"status": "ok"}
 
-    @app.errorhandler(413)
-    def too_large(error):
-        return render_template("errors/error.html", code=413, message="The upload is too large. Use a file smaller than 2 MB."), 413
+    messages = {
+        400: "The request could not be accepted. Refresh the page and try again.",
+        403: "You do not have permission to access this project.",
+        404: "We could not find that page or project.",
+        413: "The upload is too large. Use a file smaller than 2 MB.",
+        429: "Too many requests. Please wait a moment before trying again.",
+        500: "Something went wrong. Please try again later.",
+    }
+
+    def error_page(error):
+        code = error.code
+        if code == 500:
+            db.session.rollback()
+        app.logger.warning("Request rejected with status %d", code)
+        return render_template("errors/error.html", code=code, message=messages[code]), code
+
+    for code in messages:
+        app.register_error_handler(code, error_page)
+
+    @app.after_request
+    def security_headers(response):
+        response.headers.update({
+            "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "same-origin",
+            "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+        })
+        if app.config["PRODUCTION"]:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        if (current_user.is_authenticated or request.path.startswith("/auth/")
+                or response.mimetype in {"application/pdf", "text/csv"} or response.status_code >= 400):
+            response.headers["Cache-Control"] = "no-store"
+        response.headers.pop("Server", None)
+        return response
 
     with app.app_context():
         db.create_all()

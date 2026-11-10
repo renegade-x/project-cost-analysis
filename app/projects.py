@@ -124,7 +124,7 @@ def delete_item(project_id, item_id):
 
 @bp.post("/projects/<int:project_id>/upload")
 @login_required
-@limiter.limit("10 per minute")
+@limiter.limit("10 per minute", override_defaults=False)
 def upload(project_id):
     project = get_owned_project_or_403(project_id)
     try:
@@ -157,7 +157,7 @@ def chart_data(project_id):
 
 @bp.post("/projects/<int:project_id>/analysis")
 @login_required
-@limiter.limit("5 per minute")
+@limiter.limit("5 per minute", override_defaults=False)
 def analysis(project_id):
     project = get_owned_project_or_403(project_id)
     if not project.items:
