@@ -6,8 +6,9 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
 from .analysis import aggregate_by_category, compute_rows, compute_totals, detect_anomalies
+from .ai_summary import generate_summary
 from .extensions import db, limiter
-from .models import CostItem, Project
+from .models import CostItem, Project, utcnow
 from .security import get_owned_project_or_403, validate_amount, validate_category
 from .uploads import UploadError, parse_upload
 
@@ -151,3 +152,18 @@ def chart_data(project_id):
         "actual": [row["actual"] for row in categories],
         "variance": [row["variance"] for row in categories],
     }
+
+
+@bp.post("/projects/<int:project_id>/analysis")
+@login_required
+@limiter.limit("5 per minute")
+def analysis(project_id):
+    project = get_owned_project_or_403(project_id)
+    if not project.items:
+        flash("Add at least one cost item before generating a summary.", "error")
+    else:
+        project.ai_summary, project.ai_summary_source = generate_summary(project)
+        project.ai_summary_at = utcnow()
+        db.session.commit()
+        flash("Cost analysis summary generated.", "success")
+    return redirect(url_for("projects.detail", project_id=project.id))
