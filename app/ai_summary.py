@@ -36,7 +36,8 @@ def build_template_summary(totals: dict, categories: list[dict], anomalies: list
         sentences.append(f"The largest saving is {row['category']} at {abs(row['variance']):,.2f} below estimate.")
     else:
         sentences.append("No category currently shows a saving.")
-    sentences.append(f"There are {len(anomalies)} unusual expenses to review.")
+    sentences.append("There is 1 unusual expense to review." if len(anomalies) == 1
+                     else f"There are {len(anomalies)} unusual expenses to review.")
     return " ".join(sentences)
 
 

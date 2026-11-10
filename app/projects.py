@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_file, url_for
+from pathlib import Path
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
@@ -184,3 +185,9 @@ def export_csv(project_id):
     project = get_owned_project_or_403(project_id)
     return send_file(build_csv(project), mimetype="text/csv", as_attachment=True,
                      download_name=f"cost-report-{project.id}.csv")
+
+
+@bp.get("/sample.csv")
+def sample_csv():
+    return send_file(Path(current_app.root_path).parent / "sample_data" / "valid_costs.csv",
+                     mimetype="text/csv", as_attachment=True, download_name="sample-costs.csv")

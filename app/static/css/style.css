@@ -18,7 +18,7 @@ button,a,input { -webkit-tap-highlight-color:transparent; }
 .secondary:hover { background:var(--soft); }
 .small { padding:7px 14px; font-size:13px; }
 .full { width:100%; }
-.card { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:28px; }
+.card { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:28px; min-width:0; }
 .muted { color:var(--muted); }
 .eyebrow { color:var(--green); text-transform:uppercase; letter-spacing:2px; font-size:11px; font-weight:700; margin:0 0 12px; }
 h1,h2,h3,p { margin-top:0; }
@@ -64,15 +64,14 @@ input:not([type=submit]):not([type=hidden]) { width:100%; padding:11px 12px; bor
 .metric p { color:var(--muted); font-size:12px; margin-bottom:8px; }
 .metric strong { display:block; font-size:28px; font-weight:600; letter-spacing:-1px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .metric span { display:block; color:var(--muted); font-size:11px; margin-top:8px; }
-.entry-grid { display:grid; grid-template-columns:1fr; gap:24px; margin-bottom:28px; }
-.entry-grid { grid-template-columns:1.5fr 1fr; }
+.entry-grid { display:grid; grid-template-columns:1.5fr 1fr; gap:24px; margin-bottom:28px; }
 .upload-card .form-note { margin-top:20px; }
 .error-card { margin:64px auto; max-width:700px; }
 .error-card .button { margin-top:24px; }
 [hidden] { display:none !important; }
 .chart-section { margin:36px 0; }
-.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:22px; }
-.chart-frame { position:relative; height:310px; }
+.charts-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-top:22px; }
+.chart-frame { position:relative; height:310px; width:100%; min-width:0; }
 .chart-description { font-size:12px; color:var(--muted); margin-bottom:20px; }
 .chart-note { font-size:12px; }
 .insights-section { margin:36px 0; }
@@ -86,17 +85,25 @@ input:not([type=submit]):not([type=hidden]) { width:100%; padding:11px 12px; bor
 .summary-action form { flex-shrink:0; }
 .privacy-note { font-size:11px; color:var(--muted); max-width:480px; margin:0; }
 .download-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.sample-link { display:inline-block; font-size:12px; margin-top:18px; }
+.help-panel { border-top:1px solid var(--line); padding:28px 0 0; margin-top:32px; }
+.help-panel h3 { font-size:14px; }
+.help-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:36px; font-size:11px; color:var(--muted); }
+.help-grid strong { color:var(--green); font-size:11px; }
+.help-grid p { margin-top:8px; line-height:1.8; }
+.page-heading h1 { overflow-wrap:anywhere; }
+@media(max-width:650px) { .help-grid { grid-template-columns:1fr; gap:12px; } .brand { font-size:16px; } .nav-links { gap:10px; font-size:12px; } .brand-mark { width:32px; height:32px; } .nav { gap:12px; } }
 @media(max-width:800px) { .page-heading { align-items:start; flex-direction:column; } }
 @media(max-width:600px) { .summary-action { align-items:start; flex-direction:column; gap:16px; } }
 @media(max-width:600px) { .anomaly-row { align-items:start; flex-direction:column; gap:8px; } }
-@media(max-width:850px) { .charts-grid { grid-template-columns:1fr; } }
+@media(max-width:850px) { .charts-grid { grid-template-columns:minmax(0,1fr); } }
 .section-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:12px; }
 .section-heading h2 { margin-bottom:0; font-size:20px; }
 .section-heading .eyebrow { margin-bottom:8px; }
 .step-number { font:normal 32px Georgia,serif; color:#b0c0af; }
 .item-form-fields { display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; }
 .table-card { margin-bottom:28px; }
-.table-scroll { overflow-x:auto; margin-top:22px; }
+.table-scroll { position:relative; overflow-x:auto; margin-top:22px; }
 table { width:100%; border-collapse:collapse; text-align:left; font-size:13px; }
 th,td { padding:14px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
 thead th { font-size:11px; color:var(--muted); font-weight:600; background:#f7f8f4; white-space:nowrap; }

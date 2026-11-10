@@ -1,7 +1,7 @@
 {% macro field(input, autocomplete='off') %}
 <div class="field">
   {{ input.label }}
-  {{ input(autocomplete=autocomplete, aria_describedby=input.id ~ '-errors' if input.errors else none) }}
+  {{ input(autocomplete=autocomplete, inputmode='decimal' if input.id in ['estimated', 'actual'] else none, aria_describedby=input.id ~ '-errors' if input.errors else none) }}
   {% if input.errors %}<ul id="{{ input.id }}-errors" class="field-errors">{% for error in input.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
 </div>
 {% endmacro %}
