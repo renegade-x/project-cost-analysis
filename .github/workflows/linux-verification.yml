@@ -1,0 +1,43 @@
+name: Linux verification
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: .python-version
+      - name: Install pinned requirements
+        run: python -m pip install --no-cache-dir -r requirements.txt
+      - name: Run offline tests
+        run: python -m pytest -q
+      - name: Check dependencies
+        run: python -m pip check
+      - name: Start Gunicorn with production configuration
+        shell: bash
+        env:
+          APP_ENV: production
+          DATABASE_URL: sqlite://
+        run: |
+          set -euo pipefail
+          export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+          gunicorn wsgi:app --workers 1 --bind 127.0.0.1:8000 > /tmp/cost-analyzer-gunicorn.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          if ! curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 1 --max-time 2 http://127.0.0.1:8000/healthz > /tmp/cost-analyzer-health.json; then
+            cat /tmp/cost-analyzer-gunicorn.log
+            exit 1
+          fi
+          python -c 'import json; assert json.load(open("/tmp/cost-analyzer-health.json")) == {"status": "ok"}; print("PASS: Linux Gunicorn production startup and health endpoint")'
