@@ -54,7 +54,8 @@ Code review found no string-built SQL, `|safe` on user data, `innerHTML`, `eval`
 - The application removes a `Server` header when present in the Flask response, but the WSGI server or hosting proxy may add its own header after Flask; stripping that requires server/proxy configuration.
 - Statistical anomalies are review signals, not proof of error or fraud. Large uniform overruns use the fallback threshold when there is no statistical spread.
 - Gemini output can be inaccurate even with aggregate inputs. Review summaries against the actual data. The configured model and free-tier availability depend on Google and the account.
-- Linux Gunicorn startup has passed on GitHub Actions. Live Gemini and hosted HTTPS checks remain pending; the user chose PythonAnywhere after Render required payment information. See `docs/verification.md` for evidence and limits.
+- Linux Gunicorn startup has passed on GitHub Actions for Python 3.13 and 3.14.5. Real Gemini summaries, hosted HTTPS, cookie flags, response headers, reports, and cross-user denial have passed on PythonAnywhere. See `docs/verification.md` for evidence and limits.
+- PythonAnywhere free hosting requires renewal from the Web dashboard before its displayed expiry. The observed expiry was 10 December 2026. SQLite data lives in the hosting account's filesystem; no application-level backup or disaster recovery is implemented.
 
 ## Data sent to third parties
 

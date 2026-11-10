@@ -1,5 +1,7 @@
 # PythonAnywhere free deployment
 
+**Deployed and verified:** <https://mhassank.pythonanywhere.com/>. The live app uses Python 3.13 and `gemini-3.5-flash-lite`. Its Web dashboard showed an expiry of **10 December 2026**; renew it before expiry with **Run until 1 month from today**. The instructions below document the setup for later maintenance or recreation.
+
 Use the **Beginner ($0)** account. This is the plan's no-card fallback after Render required payment information. Its current limits include one web app/worker, 512 MiB disk, restricted outbound access, and a monthly web-app expiry that must be extended in the dashboard. PythonAnywhere's allowlist includes `.googleapis.com`; verify the real Gemini call from the host after adding the key.
 
 ## Account step

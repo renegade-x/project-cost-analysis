@@ -2,6 +2,8 @@
 
 Use synthetic data only. Start the local app using the README. Create two demo accounts for ownership checks. Never show `.env`, API keys, session cookie values, or real private cost data.
 
+Live verification evidence has been captured under the ignored `artifacts/` directory: `live-deployment-full.jpg`, `live-deployment-overview.jpg`, `live-ownership-403.jpg`, `live-http-checks.json`, and `live-report-1.png`/`live-report-2.png`. These include an actual hosted Gemini summary; no key or cookie values are shown. Select the relevant evidence and capture any additional course-specific screenshots below.
+
 1. Registration form, including password length guidance.
 2. Login form and a generic wrong-credentials message.
 3. Project list showing only the current user's projects.

@@ -2,6 +2,8 @@
 
 A small Flask application for a Software Quality Engineering assignment. Create private projects, enter costs manually or import a CSV/XLSX spreadsheet, compare estimated and actual spending, and download a PDF report or CSV results.
 
+**Live app:** [mhassank.pythonanywhere.com](https://mhassank.pythonanywhere.com/). Choose **Create account** to start your own workspace; this login is separate from the PythonAnywhere hosting account. Live Gemini summaries, uploads, charts, reports, HTTPS, cookies, and ownership checks have been verified. See [the verification record](docs/verification.md).
+
 ## Features
 
 - Accounts with hashed passwords and private, owned projects.
@@ -63,6 +65,8 @@ Without a configured development `SECRET_KEY`, the app generates a random value 
 | `GEMINI_API_KEY` | Empty | Optional key for Google's API; empty uses the local template. |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Model identifier, overridable if availability changes. |
 
+The verified live deployment overrides `GEMINI_MODEL` with `gemini-3.5-flash-lite`. Use that value for a current setup: the original 2.5 Flash model rejected this key's requests as unavailable to new users. Real summary generation was verified locally and from the hosted app.
+
 Production cookies require HTTPS. Use development mode for the local HTTP demo. Never commit `.env`, database files, or API keys.
 
 ## Cost data and calculations
@@ -107,7 +111,7 @@ The three required security demonstrations print clear PASS lines for invalid up
 
 ## Render deployment preparation
 
-**Current no-card hosting choice:** see [the PythonAnywhere setup guide](docs/pythonanywhere_setup.md). Render's account-level payment requirement blocked its free-service creation for this account; no Render service was created. Linux/Gunicorn verification has already passed on [GitHub Actions](https://github.com/renegade-x/project-cost-analysis/actions/runs/42854607377).
+**Current live host:** the app is deployed on PythonAnywhere's free Beginner plan; see [the setup guide](docs/pythonanywhere_setup.md). Its Web dashboard showed an expiry of **10 December 2026**. Before expiry, open **Web** and click **Run until 1 month from today**. Render's account-level payment requirement blocked its free-service creation for this account; no Render service was created. Linux/Gunicorn verification passed on [GitHub Actions](https://github.com/renegade-x/project-cost-analysis/actions/runs/42859662785).
 
 ### Verify a real Gemini response locally
 
