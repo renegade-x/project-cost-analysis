@@ -1,0 +1,13 @@
+.venv/
+.venv-verify/
+.env
+*.db
+*.db-*
+__pycache__/
+.pytest_cache/
+instance/
+.tmp/
+artifacts/
+sample_data/valid_costs.xlsx
+sample_data/too_large.csv
+.coverage
