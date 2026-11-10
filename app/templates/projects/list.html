@@ -1,2 +1,16 @@
 {% extends 'base.html' %}
-{% block content %}<h1>Your projects</h1>{% endblock %}
+{% from '_forms.html' import field %}
+{% block title %}Your projects · Cost Analyzer{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">Your workspace</p><h1>Projects</h1><p class="muted">A clear picture of every budget, from estimate to actual.</p></div><span class="tag">{{ projects|length }} project{{ '' if projects|length == 1 else 's' }}</span></div>
+<div class="project-layout">
+  <section aria-label="Your projects">
+  {% for project in projects %}
+    <a class="project-card card" href="{{ url_for('projects.detail', project_id=project.id) }}"><div class="project-icon" aria-hidden="true">{{ '%02d'|format(loop.index) }}</div><div><h2>{{ project.name }}</h2><p class="muted">{{ project.items|length }} cost item{{ '' if project.items|length == 1 else 's' }} · Created {{ project.created_at.strftime('%d %b %Y') }}</p></div><span class="project-arrow" aria-hidden="true">↗</span></a>
+  {% else %}
+    <div class="empty-state card"><div class="empty-symbol" aria-hidden="true">＋</div><h2>Your first project starts here</h2><p class="muted">Create a project, then enter costs or upload a spreadsheet to start your analysis.</p></div>
+  {% endfor %}
+  </section>
+  <aside class="card create-card"><p class="eyebrow">Something new</p><h2>Create a project</h2><p class="muted">Give your budget a home.</p><form method="post">{{ form.hidden_tag() }}{{ field(form.name) }}{{ form.submit(class_='button full') }}</form><p class="form-note">You can add costs manually or import a CSV or Excel file.</p></aside>
+</div>
+{% endblock %}

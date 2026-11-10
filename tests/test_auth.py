@@ -9,9 +9,10 @@ def registration(client, **changes):
     return client.post("/auth/register", data=data, follow_redirects=True)
 
 
-def test_register_success(client):
+def test_register_success(app, client):
     assert b"Account created" in registration(client).data
-    assert db.session.scalar(db.select(User)).check_password("strong-password")
+    with app.app_context():
+        assert db.session.scalar(db.select(User)).check_password("strong-password")
 
 
 def test_duplicate_username_is_generic(client, make_user):
@@ -20,9 +21,10 @@ def test_duplicate_username_is_generic(client, make_user):
 
 
 @pytest.mark.parametrize("changes", [{"password": "short"}, {"username": "bad name"}, {"username": "ab"}, {"confirm_password": "different"}])
-def test_registration_validation(client, changes):
+def test_registration_validation(app, client, changes):
     registration(client, **changes)
-    assert db.session.scalar(db.select(User)) is None
+    with app.app_context():
+        assert db.session.scalar(db.select(User)) is None
 
 
 def test_login_and_logout(client, make_user, login):

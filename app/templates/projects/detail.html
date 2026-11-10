@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.name }} · Cost Analyzer{% endblock %}
+{% block content %}
+<div class="page-heading"><div><a class="back-link" href="{{ url_for('projects.index') }}">← All projects</a><p class="eyebrow">Project overview</p><h1>{{ project.name }}</h1><p class="muted">Your estimates and actual costs, side by side.</p></div></div>
+<section class="card"><h2>Cost items</h2><p class="muted">This project is ready for cost data.</p></section>
+<details class="delete-project"><summary>Delete this project</summary><p>This permanently removes the project and all its cost items.</p><form method="post" action="{{ url_for('projects.delete', project_id=project.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger" type="submit">Delete project and all items</button></form></details>
+{% endblock %}
