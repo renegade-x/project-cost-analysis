@@ -107,6 +107,18 @@ The three required security demonstrations print clear PASS lines for invalid up
 
 ## Render deployment preparation
 
+### Verify a real Gemini response locally
+
+Save your key privately as `GEMINI_API_KEY` in the ignored `.env` file. From the repository directory run:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.verify_live_gemini
+```
+
+This sends only three synthetic category aggregates to Google, uses no project database, and prints no key. A passing check explicitly reports `Summary source: gemini`; a template fallback is reported as a failed live verification. The selected `GEMINI_MODEL` must be available to the key and its free-tier quota. Keep this network check separate from the offline pytest suite.
+
+### Deploy the prepared service
+
 1. Push this repository to GitHub, then create a Render Blueprint using `render.yaml`.
 2. The blueprint selects a free Python web service, installs pinned requirements, runs one Gunicorn worker, generates `SECRET_KEY`, and checks `/healthz`.
 3. Set `GEMINI_API_KEY` in Render's dashboard if desired. An empty value keeps the offline fallback. Set `GEMINI_MODEL` to an available model for your key.
