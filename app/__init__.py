@@ -17,6 +17,8 @@ def create_app(config_object=None) -> Flask:
     limiter.init_app(app)
     login_manager.login_view = "auth.login"
 
+    from . import models  # Register tables before create_all.
+
     @app.get("/healthz")
     @limiter.exempt
     def healthz():
